@@ -1,0 +1,1195 @@
+{
+  "name": "Reddit lead generator final",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        864,
+        -176
+      ],
+      "id": "67c5a000-63e3-481d-8eba-c0ffb2ba5987",
+      "name": "Loop Over Items",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nif (item.aiResponse && item.aiResponse.trim().toUpperCase() === 'YES') {\n  return [{ json: item }];\n}\n\n// Discard unqualified items\nreturn [];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2128,
+        0
+      ],
+      "id": "4562ecea-d413-4f2d-8394-1f0a813350bf",
+      "name": "ai response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the static workflow data safely\nconst staticData = $getWorkflowStaticData('global') || {};\n\n// Initialize qualifiedItems if it doesn't exist\nif (!staticData.qualifiedItems) {\n  staticData.qualifiedItems = [];\n}\n\n// Make a copy of the qualified items\nconst qualifiedItems = [...staticData.qualifiedItems];\n\n// Clear for next run (optional - only if you want fresh data each time)\nstaticData.qualifiedItems = [];\n\n// Debug output\nconsole.log('Qualified items count:', qualifiedItems.length);\nconsole.log('Qualified items:', JSON.stringify(qualifiedItems, null, 2));\n\n// Return the formatted items\nreturn qualifiedItems.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        -176
+      ],
+      "id": "27698136-8cba-4881-ad87-4eea90df390b",
+      "name": "Code",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const keywords = [\n  \"need help\",\n  \"looking for\",\n  \"recommend an agency\",\n  \"hire developer\",\n  \"anyone know someone\"\n];\n\nreturn items\n  .map(item => {\n    const text = (item.json.title + ' ' + item.json.content).toLowerCase();\n\n    const matchedKeywords = keywords.filter(k => text.includes(k));\n    \n    if (matchedKeywords.length > 0) {\n      item.json.intentMatched = matchedKeywords.join(\", \");\n      return item;\n    }\n    \n    return null; // discard non-matching\n  })\n  .filter(item => item !== null);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        -176
+      ],
+      "id": "64ee76f0-7a6a-4434-948d-546feb98005c",
+      "name": "filter"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3184,
+        -160
+      ],
+      "id": "4a9bd706-eeae-463c-8551-879c2cd9cf59",
+      "name": "Wait",
+      "webhookId": "9056833e-bb85-4a68-bc28-bc6469a657ee"
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = items[0].json.data.children;\nreturn posts.map(post => {\n  const data = post.data;\n  return {\n    json: {\n      title: data.title,\n      content: data.selftext || '',\n      url: `https://reddit.com${data.permalink}`,\n      subreddit: data.subreddit,\n      author: data.author,\n      date: new Date(data.created_utc * 1000).toISOString()\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        16
+      ],
+      "id": "cdb5d7ea-bda3-4329-bf88-0d71e755319e",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = items[0].json.data.children;\nreturn posts.map(post => {\n  const data = post.data;\n  return {\n    json: {\n      title: data.title,\n      content: data.selftext || '',\n      url: `https://reddit.com${data.permalink}`,\n      subreddit: data.subreddit,\n      author: data.author,\n      date: new Date(data.created_utc * 1000).toISOString()\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -176
+      ],
+      "id": "05aede99-2e4f-42f4-a3d2-e40f472e8fc6",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = items[0].json.data.children;\nreturn posts.map(post => {\n  const data = post.data;\n  return {\n    json: {\n      title: data.title,\n      content: data.selftext || '',\n      url: `https://reddit.com${data.permalink}`,\n      subreddit: data.subreddit,\n      author: data.author,\n      date: new Date(data.created_utc * 1000).toISOString()\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -368
+      ],
+      "id": "68131534-92eb-4be6-bb2c-343408ac8ac2",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        -192
+      ],
+      "id": "15a5760b-2ef7-41ef-98a6-23a1f9f8bf63",
+      "name": "Merge"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -176
+      ],
+      "id": "6b4f810b-f82a-40a1-a908-e7eb033424a6",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "url": "https://oauth.reddit.com/r/startup/new",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "redditOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "6ac5a7ee-6836-476a-aaf9-73607f4847d6",
+      "name": "HTTP startup",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "eI56ReLGG80hWRG9",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://oauth.reddit.com/r/marketing/new",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "redditOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        -176
+      ],
+      "id": "045e2f64-650a-4b52-91cc-e3069625951a",
+      "name": "HTTP marketing",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "eI56ReLGG80hWRG9",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1bCNSc4rQtiVjDHtUCUZEn0uzF0gR5wKhuuc-NTu90ug",
+          "mode": "list",
+          "cachedResultName": "Reddit Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bCNSc4rQtiVjDHtUCUZEn0uzF0gR5wKhuuc-NTu90ug/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bCNSc4rQtiVjDHtUCUZEn0uzF0gR5wKhuuc-NTu90ug/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post Title ": "={{ $json[\"Post Title\"] }}",
+            "Post URL": "={{ $json[\"Post URL\"] }}",
+            "Subreddit": "={{ $json.Subreddit }}",
+            "Author": "={{ $json.Author }}",
+            "Date Posted": "={{ $json[\"Date Posted \"] }}",
+            "Intent Matched": "={{ $json[\"Intent Matched \"] }}",
+            "Notes": "={{ $json[\"Notes \"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Post Title ",
+              "displayName": "Post Title ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Post URL",
+              "displayName": "Post URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Subreddit",
+              "displayName": "Subreddit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Author",
+              "displayName": "Author",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date Posted",
+              "displayName": "Date Posted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Intent Matched",
+              "displayName": "Intent Matched",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        3488,
+        -176
+      ],
+      "id": "4b765b02-6b16-493d-b728-b01ca8181c12",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cnWnHYQBLqc0ZODs",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f38df2c-5443-4ac0-a51b-5ceb7518d0f2",
+              "name": "Post Title",
+              "value": "={{ $('filter').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "95575d6f-c1c5-4941-9968-fb94c479eb9c",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2672,
+        -160
+      ],
+      "id": "fbe4e777-f6f5-400c-aa50-9b8ce39de182",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "https://oauth.reddit.com/r/hireaprogrammer/new",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "redditOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        -368
+      ],
+      "id": "bc066200-a6c2-411d-b2b1-34f67a7645a8",
+      "name": "HTTP Request",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "eI56ReLGG80hWRG9",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -464,
+        -176
+      ],
+      "id": "76a2d357-1282-44b8-aadf-2ed9a45ad5fa",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-nano",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-NANO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a lead qualification expert. Analyze this Reddit post and determine if the author is genuine\n\nRespond with ONLY \"YES\" if this is a genuine hiring opportunity, or \"NO\" if it’s not.",
+              "role": "system"
+            },
+            {
+              "content": "=Title: \"{{ $json.title || 'No title' }}\"\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1072,
+        -80
+      ],
+      "id": "f4a34b51-c488-452f-aba1-dc0f94437b6b",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "mEGPpgAtSnmCPvB2",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = items[0].json.data.children;\nreturn posts.map(post => {\n  const data = post.data;\n  return {\n    json: {\n      title: data.title,\n      content: data.selftext || '',\n      url: `https://reddit.com${data.permalink}`,\n      subreddit: data.subreddit,\n      author: data.author,\n      date: new Date(data.created_utc * 1000).toISOString()\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        720
+      ],
+      "id": "01b84987-741a-4a8c-a8c1-418344c2cd35",
+      "name": "Parse hireaprogrammer"
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = items[0].json.data.children;\nreturn posts.map(post => {\n  const data = post.data;\n  return {\n    json: {\n      title: data.title,\n      content: data.selftext || '',\n      url: `https://reddit.com${data.permalink}`,\n      subreddit: data.subreddit,\n      author: data.author,\n      date: new Date(data.created_utc * 1000).toISOString()\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        912
+      ],
+      "id": "c70ef6a9-3d9a-4cc2-af5e-e91dcdf9d3c2",
+      "name": "Parse marketing"
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = items[0].json.data.children;\nreturn posts.map(post => {\n  const data = post.data;\n  return {\n    json: {\n      title: data.title,\n      content: data.selftext || '',\n      url: `https://reddit.com${data.permalink}`,\n      subreddit: data.subreddit,\n      author: data.author,\n      date: new Date(data.created_utc * 1000).toISOString()\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        1104
+      ],
+      "id": "472f106f-174c-446e-b712-6da20ff284fe",
+      "name": "Parse startup"
+    },
+    {
+      "parameters": {
+        "jsCode": "const keywords = [\n  \"need help\",\n  \"looking for\",\n  \"recommend an agency\",\n  \"hire developer\",\n  \"anyone know someone\",\n  \"seeking\",\n  \"need someone\",\n  \"require assistance\",\n  \"looking to hire\",\n  \"need a developer\",\n  \"need a designer\",\n  \"need marketing help\"\n];\n\nreturn items\n  .map(item => {\n    const text = (item.json.title + ' ' + item.json.content).toLowerCase();\n\n    const matchedKeywords = keywords.filter(k => text.includes(k));\n    \n    if (matchedKeywords.length > 0) {\n      item.json.intentMatched = matchedKeywords.join(\", \");\n      return item;\n    }\n    \n    return null;\n  })\n  .filter(item => item !== null);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        912
+      ],
+      "id": "6361ef02-a121-408e-b2b3-a8a26068a12d",
+      "name": "Keyword Filter"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-1.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-1.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze this Reddit post and determine if the user is genuinely seeking help, services, or looking to hire someone. Consider both the title and content. Respond with only 'YES' or 'NO'.\nTitle: {{ $json.title }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        2528,
+        912
+      ],
+      "id": "41daa1f0-83c8-4df3-8485-a36044310b97",
+      "name": "AI Classification",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8wsZRHORBjDjWFni",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c5c3e3d4-9b4a-4f89-8b2f-1a2b3c4d5e6f",
+              "leftValue": "={{ $json.content.parts[0].text }}",
+              "rightValue": "=YES\\n",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [
+        2976,
+        928
+      ],
+      "id": "37b8e8b8-e8c5-441d-a54d-0b0deecd8491",
+      "name": "AI Response Filter",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc18205c-52b5-4e29-be89-0c4582a5c842",
+              "name": "Post Title",
+              "value": "={{ $('Keyword Filter').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "8301f691-5573-49e1-9878-9d0c5a4f689d",
+              "name": "Post URL",
+              "value": "={{ $('Keyword Filter').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "fbf961be-b60d-42de-b1ff-3c76da831067",
+              "name": "Subreddit",
+              "value": "={{ $('Keyword Filter').item.json.subreddit }}",
+              "type": "string"
+            },
+            {
+              "id": "088ef7ca-514b-4240-ba83-1827cc7933ea",
+              "name": "Author",
+              "value": "={{ $('Keyword Filter').item.json.author }}",
+              "type": "string"
+            },
+            {
+              "id": "25a4853d-f42c-488c-8f24-e5ed65292578",
+              "name": "Date Posted",
+              "value": "={{ $('Keyword Filter').item.json.date }}",
+              "type": "string"
+            },
+            {
+              "id": "6aba2001-2131-4587-bc45-a9a37a0e268b",
+              "name": "Intent Matched",
+              "value": "={{ $('Keyword Filter').item.json.intentMatched }}",
+              "type": "string"
+            },
+            {
+              "id": "40c55cc8-b3c4-4004-a8b1-904878eee33c",
+              "name": "Notes",
+              "value": "={{ $('Keyword Filter').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "61fa1149-fdb4-450f-b4e9-6adcf23c6169",
+              "name": "AI Verified",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3232,
+        880
+      ],
+      "id": "8077f3c2-6b03-4879-80a3-26ae5c5f61e3",
+      "name": "Format Fields"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1bCNSc4rQtiVjDHtUCUZEn0uzF0gR5wKhuuc-NTu90ug",
+          "mode": "list",
+          "cachedResultName": "Reddit Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bCNSc4rQtiVjDHtUCUZEn0uzF0gR5wKhuuc-NTu90ug/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bCNSc4rQtiVjDHtUCUZEn0uzF0gR5wKhuuc-NTu90ug/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post URL": "={{ $json[\"Post URL\"] }}",
+            "Subreddit": "={{ $json.Subreddit }}",
+            "Author": "={{ $json.Author }}",
+            "Date Posted": "={{ $json[\"Date Posted\"] }}",
+            "Intent Matched": "={{ $json[\"Intent Matched\"] }}",
+            "Notes": "={{ $json.Notes }}",
+            "Post Title ": "={{ $json['Post Title'] }}"
+          },
+          "matchingColumns": [
+            "Post Title "
+          ],
+          "schema": [
+            {
+              "id": "Post Title ",
+              "displayName": "Post Title ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Post URL",
+              "displayName": "Post URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Subreddit",
+              "displayName": "Subreddit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Author",
+              "displayName": "Author",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date Posted",
+              "displayName": "Date Posted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Intent Matched",
+              "displayName": "Intent Matched",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        3456,
+        928
+      ],
+      "id": "3c06fc60-23f2-491a-8e17-4546e866081e",
+      "name": "Save to Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cnWnHYQBLqc0ZODs",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        912
+      ],
+      "id": "fb76e6b1-1fd3-4eb2-be79-6d79f258657d",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "url": "https://oauth.reddit.com/r/hireaprogrammer/new",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "redditOAuth2Api",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 10
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1632,
+        720
+      ],
+      "id": "1cbbf007-a193-465c-b546-935ced3543ae",
+      "name": "HTTP Request1",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "eI56ReLGG80hWRG9",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://oauth.reddit.com/r/marketing/new",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "redditOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1632,
+        912
+      ],
+      "id": "c73f0c93-91ec-4250-be56-28a1bda62ea7",
+      "name": "HTTP marketing1",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "eI56ReLGG80hWRG9",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://oauth.reddit.com/r/startup/new",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "redditOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1632,
+        1104
+      ],
+      "id": "a7094b37-d44d-443b-9955-d0ae41df7d87",
+      "name": "HTTP startup1",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "eI56ReLGG80hWRG9",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        912
+      ],
+      "id": "a52bba71-3dcb-4127-8e6a-734d0664431f",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2080,
+        896
+      ],
+      "id": "e79bee38-d993-4407-862f-4dcbcbddc94b",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "content": "WE can Add multiple SUbreddits using https and merge them for more post "
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1680,
+        1296
+      ],
+      "typeVersion": 1,
+      "id": "437ec06e-b3eb-4aaf-8e1c-36f895f3ec52",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ai response": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "filter": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        [
+          {
+            "node": "HTTP startup",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP marketing",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP startup": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP marketing": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "ai response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Parse hireaprogrammer": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse marketing": {
+      "main": [
+        []
+      ]
+    },
+    "Parse startup": {
+      "main": [
+        []
+      ]
+    },
+    "Keyword Filter": {
+      "main": [
+        [
+          {
+            "node": "AI Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Classification": {
+      "main": [
+        [
+          {
+            "node": "AI Response Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Response Filter": {
+      "main": [
+        [
+          {
+            "node": "Format Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Fields": {
+      "main": [
+        [
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Parse hireaprogrammer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP marketing1": {
+      "main": [
+        [
+          {
+            "node": "Parse marketing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP startup1": {
+      "main": [
+        [
+          {
+            "node": "Parse startup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP marketing1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP startup1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Keyword Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7d6ae8c3-42b8-489c-ac95-99f9a1fec4dd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ceb8fe018244f4fe3ffcf6cb8e0b760570fd1673930109d4144d83e5298c947e"
+  },
+  "id": "sC94Sk7Q6TbDfeIc",
+  "tags": []
+}
